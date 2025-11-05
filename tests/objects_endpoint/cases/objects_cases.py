@@ -5,6 +5,14 @@ from random import choice
 
 @dataclass
 class Data:
+    """
+    Data container for object attributes.
+    
+    Represents product specifications with optional fields for electronics:
+    - Technical specifications (CPU, screen, capacity)
+    - Product information (year, generation, color) 
+    - Pricing data
+    """
     year: Optional[int] = None
     price: Optional[Union[int, float]] = None
     cpu_model: Optional[str] = None
@@ -35,6 +43,13 @@ class Data:
 
 @dataclass
 class Object:
+    """
+    Main object container with name and nested data.
+    
+    Represents a product entity with:
+    - Product name identifier
+    - Optional specifications data dictionary
+    """
     name: str
     data: Data.to_dict = None
 
@@ -47,7 +62,13 @@ class Object:
 
 
 class TestData:
-    """Generator for test data with various scenarios"""
+    """
+    Test data generator for object API testing.
+    
+    Provides methods to generate valid and invalid test data
+    for electronics products (laptops, phones, tablets).
+    Contains predefined valid and invalid value ranges.
+    """
     
     # Valid test data ranges
     VALID_YEARS = list(range(2018, 2024))
@@ -81,18 +102,20 @@ class TestData:
 
     @classmethod
     def random_types(cls):
+        """Randomly select from available product types."""
         types = cls.PRODUCT_TYPES.keys()
         return choice(list(types))
 
     @classmethod
     def random_product(cls):
+        """Randomly select product name from available types."""
         type_product = cls.random_types()
         product = cls.PRODUCT_TYPES[type_product]
         return choice(product)
 
     @classmethod
     def random_valid_data(cls):
-        """Generate valid test data"""
+        """Generate valid test data with complete specifications."""
         return Object(
             name=cls.random_product(),
             data=Data(
@@ -108,7 +131,7 @@ class TestData:
 
     @classmethod
     def random_invalid_name(cls):
-        """Generate object with invalid name"""
+        """Generate object with invalid name field."""
         return Object(
             name=choice(cls.INVALID_NAMES),
             data=Data(
@@ -120,7 +143,7 @@ class TestData:
 
     @classmethod
     def random_invalid_year(cls):
-        """Generate object with invalid year"""
+        """Generate object with invalid year field."""
         return Object(
             name=cls.random_product(),
             data=Data(
@@ -132,7 +155,7 @@ class TestData:
 
     @classmethod
     def random_invalid_price(cls):
-        """Generate object with invalid price"""
+        """Generate object with invalid price field."""
         return Object(
             name=cls.random_product(),
             data=Data(
@@ -144,7 +167,7 @@ class TestData:
 
     @classmethod
     def random_invalid_cpu_model(cls):
-        """Generate object with invalid CPU model"""
+        """Generate object with invalid CPU model field."""
         return Object(
             name=cls.random_product(),
             data=Data(
@@ -156,7 +179,7 @@ class TestData:
 
     @classmethod
     def random_invalid_capacity(cls):
-        """Generate object with invalid capacity"""
+        """Generate object with invalid capacity field."""
         return Object(
             name=cls.random_product(),
             data=Data(
@@ -168,7 +191,7 @@ class TestData:
 
     @classmethod
     def random_invalid_screen_size(cls):
-        """Generate object with invalid screen size"""
+        """Generate object with invalid screen size field."""
         return Object(
             name=cls.random_product(),
             data=Data(
@@ -180,7 +203,7 @@ class TestData:
 
     @classmethod
     def random_mixed_invalid_data(cls):
-        """Generate object with multiple invalid fields"""
+        """Generate object with multiple invalid fields."""
         return Object(
             name=choice(cls.INVALID_NAMES),
             data=Data(
@@ -195,10 +218,16 @@ class TestData:
 
 def payload(case):
     """
+    Test payload generator for API testing.
+    
     Args:
         case: Test case identifier string
+        
     Returns:
         Dictionary with payload data for the specified test case
+        
+    Raises:
+        ValueError: If unknown test case provided
     """
     cases = {
         "valid_data": TestData.random_valid_data,

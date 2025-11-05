@@ -35,7 +35,12 @@ from objects_endpoint.cases.objects_cases import (
 )
 @pytest.mark.objects
 class TestObjectPOSTandPUT:
-    """Test suite for POST, PUT api/Objects endpoints."""
+    """
+    Test suite for POST and PUT api/Objects endpoints.
+    
+    Tests object creation and update scenarios with various data validation cases.
+    Includes expected failures for known API validation gaps.
+    """
 
     @pytest.fixture(autouse=True)
     def setup(self, object_client):
@@ -47,7 +52,31 @@ class TestObjectPOSTandPUT:
             case,
             expected_http_code
         ):
+        """
+        TEST: Create and Update Object with Various Data Scenarios
         
+        Steps:
+        1. Generate test payload for specified case
+        2. Send POST request to create object
+        3. Verify response status code matches expected value
+        4. For successful creation (200 OK):
+           - Validate response contains required keys: id, name, data, createdAt
+           - Verify response data matches request payload
+           - Extract object ID from response
+           - Send PUT request to update the created object
+           - Verify update response status code
+        
+        Args:
+            case: Test case identifier for payload generation
+            expected_http_code: Expected HTTP status code(s) for the test case
+            
+        Verifies:
+        - API properly handles object creation with different data cases
+        - Created objects contain all required fields and match input data
+        - Objects can be successfully updated after creation
+        - Error cases return appropriate status codes
+        """
+
         payload_data = payload(case)
 
         response = self.client.post_object(payload_data)
@@ -62,6 +91,11 @@ class TestObjectPOSTandPUT:
             response_data = response.json()
             response_keys = set(response_data.keys())
             lost_keys = required_keys - response_keys
+            
+            assert lost_keys == set(), \
+                f"Got {response_data}"
+            assert payload_data["name"] == response_data["name"]
+            assert payload_data["data"] == response_data["data"]
         
             obj_id = response.json()["id"]
             response_put = self.client.update_object(
